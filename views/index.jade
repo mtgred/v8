@@ -1,0 +1,28 @@
+extends layout
+
+block body
+  div.openerp
+    div.navbar
+    div.main
+      div.menu
+        a.logo(href="/")
+          img(src="/img/logo.png")
+      div.content
+
+  script(type="text/template", id="mainmenu-item")
+    a(href!="/app/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
+
+  script(type="text/template", id="sales-app")
+    div.pageHeader
+      h2 <%= name %>
+    div.page Sales
+
+  script(type="text/template", id="ecommerce-app")
+    div.pageHeader
+      h2 <%= name %>
+    div.page eCommerce
+
+  script(type="text/template", id="settings-app")
+    div.pageHeader
+      h2 <%= name %>
+    div.page Settings
