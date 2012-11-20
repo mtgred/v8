@@ -2,7 +2,6 @@ class OpenERP extends Backbone.Router
   constructor: (options) ->
     super(options)
     @mainMenu = new Backbone.Collection
-    @secondaryMenu = new Backbone.Collection
     @mainMenuView = new MainMenuView(collection: @mainMenu)
     @addApp(new SalesApp)
     @addApp(new ECommerceApp)
@@ -17,7 +16,7 @@ class OpenERP extends Backbone.Router
     @apps[app.name] = app
   loadApp: (app) =>
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
-    $('.content').html(@apps[app].view)
+    @apps[app].load()
 
 # Main menu
 class MainMenuItemView extends Backbone.View
@@ -28,7 +27,7 @@ class MainMenuItemView extends Backbone.View
   render: => $(@el).html(@template @model.toJSON())
   navigate: (e) ->
     e.preventDefault()
-    openerp.navigate($(@el).find('a').attr('href'), trigger: true)
+    openerp.navigate(e.srcElement.pathname, trigger: true)
 
 class MainMenuView extends Backbone.View
   className: 'mainMenu'
@@ -41,43 +40,97 @@ class MainMenuView extends Backbone.View
     $(@el).empty()
     @collection.each (i) => @addItem(i)
 
-class SecondaryMenuView extends Backbone.View
-
 # Apps
-class SalesApp
+class PageHeaderView extends Backbone.View
+  template: _.template $('#page-header').html()
+  initialize: (@page) ->
+  events:
+    'keyup .searchbox': 'filter'
+    'click .searchclear': 'searchclear'
+  render: ->
+    $(@el).html(@template(name: @page.name))
+  filter: =>
+    s = $('.search').val().toLowerCase()
+    if s
+      #$(@el).find('> ul').empty()
+      #@addUser(u) for u in @collection.filter (u) -> ~u.get('name').toLowerCase().indexOf(s)
+      $('.searchclear').fadeIn('fast')
+    else
+      @searchclear()
+  searchclear: =>
+    $('.searchclear').fadeOut('fast')
+    $('.search').val('').focus()
+    @render()
+
+class AppMenuItemView extends Backbone.View
+  className: 'appMenuItem'
+  template: _.template $('#appmenu-item').html()
+  initialize: -> @model.bind('all', @render)
+  events: 'click': 'navigate'
+  render: => $(@el).html(@template @model.toJSON())
+  navigate: (e) ->
+    e.preventDefault()
+    console.log(e.srcElement.pathname)
+    #openerp.navigate($(@el).find('a').attr('href'), trigger: true)
+
+class AppMenuView extends Backbone.View
+  className: 'appMenu'
+  template: _.template $('#appmenu-section').html()
+  initialize: (@app) ->
+    @sections = {}
+    for k, v of @app.pages
+      v.app = @app.name
+      @sections[v.section] = $(@template(section: k)) unless @sections[v.section]
+      @sections[v.section].append (new AppMenuItemView(model: new Backbone.Model(v))).render()
+  render: ->
+    $(@el).append(v) for k, v of @sections
+    @el
+
+class App
+  constructor: ->
+    @views = {}
+    @appMenu = new Backbone.Collection
+    for k, v of @pages
+      v.active = false
+      @appMenu.add(new Backbone.Model(v))
+      @views[k] = (new PageHeaderView(v)).render()
+    @menu = (new AppMenuView(@)).render()
+    @activepage = @defaultpage
+    @loadPage(@activepage)
+  load: ->
+    $('.content').html(@views[@activepage])
+    $('.appmenu').html(@menu)
+  loadPage: (page) ->
+    @appMenu.each (i) -> i.set('active', i.get('name') is page)
+    @activepage = page
+
+class SalesApp extends App
   name: 'Sales'
-  constructor: ->
-    @view = (new SalesAppView).render()
+  defaultpage: 'Customers'
+  pages:
+    'Customers': {section: 'Sales', name: 'Customers'}
+    'Leads': {section: 'Sales', name: 'Leads'}
+    'Opportunities': {section: 'Sales', name: 'Opportunities'}
+    'Quotations': {section: 'Sales', name: 'Quotations'}
+    'Sale Orders': {section: 'Sales', name: 'Sale Orders'}
 
-class SalesAppView extends Backbone.View
-  template: _.template $('#sales-app').html()
-  initialize: ->
-  render: ->
-    $(@el).html(@template name: 'Sales')
-
-class ECommerceApp extends Backbone.View
+class ECommerceApp extends App
   name: 'eCommerce'
-  constructor: ->
-    @view = (new ECommerceAppView).render()
+  defaultpage: 'Home'
+  pages:
+    'Home': {section: 'Shop', name: 'Home'}
+    'Shop': {section: 'Shop', name: 'Shop'}
+    'Shopping Cart': {section: 'Shop', name: 'Shopping Cart'}
+    'Products': {section: 'Products', name: 'Products'}
+    'Product Categories': {section: 'Products', name: 'Product Categories'}
 
-class ECommerceAppView extends Backbone.View
-  template: _.template $('#ecommerce-app').html()
-  initialize: ->
-  render: ->
-    $(@el).html(@template name: 'eCommerce')
-
-class SettingsApp extends Backbone.View
+class SettingsApp extends App
   name: 'Settings'
-  constructor: ->
-    @view = (new SettingsAppView).render()
-
-class SettingsAppView extends Backbone.View
-  template: _.template $('#settings-app').html()
-  initialize: ->
-  render: ->
-    $(@el).html(@template name: 'Settings')
+  defaultpage: 'Apps'
+  pages:
+    'Apps': {section: 'Administration', name: 'Apps'}
+    'Users': {section: 'Administration', name: 'Users'}
 
 $ ->
   window.openerp = new OpenERP()
   Backbone.history.start(pushState: true)
-

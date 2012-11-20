@@ -1,5 +1,5 @@
 (function() {
-  var ECommerceApp, ECommerceAppView, MainMenuItemView, MainMenuView, OpenERP, SalesApp, SalesAppView, SecondaryMenuView, SettingsApp, SettingsAppView,
+  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageHeaderView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -11,7 +11,6 @@
     function OpenERP(options) {
       this.loadApp = __bind(this.loadApp, this);      OpenERP.__super__.constructor.call(this, options);
       this.mainMenu = new Backbone.Collection;
-      this.secondaryMenu = new Backbone.Collection;
       this.mainMenuView = new MainMenuView({
         collection: this.mainMenu
       });
@@ -42,7 +41,7 @@
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
-      return $('.content').html(this.apps[app].view);
+      return this.apps[app].load();
     };
 
     return OpenERP;
@@ -76,7 +75,7 @@
 
     MainMenuItemView.prototype.navigate = function(e) {
       e.preventDefault();
-      return openerp.navigate($(this.el).find('a').attr('href'), {
+      return openerp.navigate(e.srcElement.pathname, {
         trigger: true
       });
     };
@@ -120,123 +119,272 @@
 
   })(Backbone.View);
 
-  SecondaryMenuView = (function(_super) {
+  PageHeaderView = (function(_super) {
 
-    __extends(SecondaryMenuView, _super);
+    __extends(PageHeaderView, _super);
 
-    function SecondaryMenuView() {
-      SecondaryMenuView.__super__.constructor.apply(this, arguments);
+    function PageHeaderView() {
+      this.searchclear = __bind(this.searchclear, this);
+      this.filter = __bind(this.filter, this);
+      PageHeaderView.__super__.constructor.apply(this, arguments);
     }
 
-    return SecondaryMenuView;
+    PageHeaderView.prototype.template = _.template($('#page-header').html());
 
-  })(Backbone.View);
+    PageHeaderView.prototype.initialize = function(page) {
+      this.page = page;
+    };
 
-  SalesApp = (function() {
+    PageHeaderView.prototype.events = {
+      'keyup .searchbox': 'filter',
+      'click .searchclear': 'searchclear'
+    };
 
-    SalesApp.prototype.name = 'Sales';
-
-    function SalesApp() {
-      this.view = (new SalesAppView).render();
-    }
-
-    return SalesApp;
-
-  })();
-
-  SalesAppView = (function(_super) {
-
-    __extends(SalesAppView, _super);
-
-    function SalesAppView() {
-      SalesAppView.__super__.constructor.apply(this, arguments);
-    }
-
-    SalesAppView.prototype.template = _.template($('#sales-app').html());
-
-    SalesAppView.prototype.initialize = function() {};
-
-    SalesAppView.prototype.render = function() {
+    PageHeaderView.prototype.render = function() {
       return $(this.el).html(this.template({
-        name: 'Sales'
+        name: this.page.name
       }));
     };
 
-    return SalesAppView;
+    PageHeaderView.prototype.filter = function() {
+      var s;
+      s = $('.search').val().toLowerCase();
+      if (s) {
+        return $('.searchclear').fadeIn('fast');
+      } else {
+        return this.searchclear();
+      }
+    };
+
+    PageHeaderView.prototype.searchclear = function() {
+      $('.searchclear').fadeOut('fast');
+      $('.search').val('').focus();
+      return this.render();
+    };
+
+    return PageHeaderView;
 
   })(Backbone.View);
+
+  AppMenuItemView = (function(_super) {
+
+    __extends(AppMenuItemView, _super);
+
+    function AppMenuItemView() {
+      this.render = __bind(this.render, this);
+      AppMenuItemView.__super__.constructor.apply(this, arguments);
+    }
+
+    AppMenuItemView.prototype.className = 'appMenuItem';
+
+    AppMenuItemView.prototype.template = _.template($('#appmenu-item').html());
+
+    AppMenuItemView.prototype.initialize = function() {
+      return this.model.bind('all', this.render);
+    };
+
+    AppMenuItemView.prototype.events = {
+      'click': 'navigate'
+    };
+
+    AppMenuItemView.prototype.render = function() {
+      return $(this.el).html(this.template(this.model.toJSON()));
+    };
+
+    AppMenuItemView.prototype.navigate = function(e) {
+      e.preventDefault();
+      return console.log(e.srcElement.pathname);
+    };
+
+    return AppMenuItemView;
+
+  })(Backbone.View);
+
+  AppMenuView = (function(_super) {
+
+    __extends(AppMenuView, _super);
+
+    function AppMenuView() {
+      AppMenuView.__super__.constructor.apply(this, arguments);
+    }
+
+    AppMenuView.prototype.className = 'appMenu';
+
+    AppMenuView.prototype.template = _.template($('#appmenu-section').html());
+
+    AppMenuView.prototype.initialize = function(app) {
+      var k, v, _ref, _results;
+      this.app = app;
+      this.sections = {};
+      _ref = this.app.pages;
+      _results = [];
+      for (k in _ref) {
+        v = _ref[k];
+        v.app = this.app.name;
+        if (!this.sections[v.section]) {
+          this.sections[v.section] = $(this.template({
+            section: k
+          }));
+        }
+        _results.push(this.sections[v.section].append((new AppMenuItemView({
+          model: new Backbone.Model(v)
+        })).render()));
+      }
+      return _results;
+    };
+
+    AppMenuView.prototype.render = function() {
+      var k, v, _ref;
+      _ref = this.sections;
+      for (k in _ref) {
+        v = _ref[k];
+        $(this.el).append(v);
+      }
+      return this.el;
+    };
+
+    return AppMenuView;
+
+  })(Backbone.View);
+
+  App = (function() {
+
+    function App() {
+      var k, v, _ref;
+      this.views = {};
+      this.appMenu = new Backbone.Collection;
+      _ref = this.pages;
+      for (k in _ref) {
+        v = _ref[k];
+        v.active = false;
+        this.appMenu.add(new Backbone.Model(v));
+        this.views[k] = (new PageHeaderView(v)).render();
+      }
+      this.menu = (new AppMenuView(this)).render();
+      this.activepage = this.defaultpage;
+      this.loadPage(this.activepage);
+    }
+
+    App.prototype.load = function() {
+      $('.content').html(this.views[this.activepage]);
+      return $('.appmenu').html(this.menu);
+    };
+
+    App.prototype.loadPage = function(page) {
+      this.appMenu.each(function(i) {
+        return i.set('active', i.get('name') === page);
+      });
+      return this.activepage = page;
+    };
+
+    return App;
+
+  })();
+
+  SalesApp = (function(_super) {
+
+    __extends(SalesApp, _super);
+
+    function SalesApp() {
+      SalesApp.__super__.constructor.apply(this, arguments);
+    }
+
+    SalesApp.prototype.name = 'Sales';
+
+    SalesApp.prototype.defaultpage = 'Customers';
+
+    SalesApp.prototype.pages = {
+      'Customers': {
+        section: 'Sales',
+        name: 'Customers'
+      },
+      'Leads': {
+        section: 'Sales',
+        name: 'Leads'
+      },
+      'Opportunities': {
+        section: 'Sales',
+        name: 'Opportunities'
+      },
+      'Quotations': {
+        section: 'Sales',
+        name: 'Quotations'
+      },
+      'Sale Orders': {
+        section: 'Sales',
+        name: 'Sale Orders'
+      }
+    };
+
+    return SalesApp;
+
+  })(App);
 
   ECommerceApp = (function(_super) {
 
     __extends(ECommerceApp, _super);
 
+    function ECommerceApp() {
+      ECommerceApp.__super__.constructor.apply(this, arguments);
+    }
+
     ECommerceApp.prototype.name = 'eCommerce';
 
-    function ECommerceApp() {
-      this.view = (new ECommerceAppView).render();
-    }
+    ECommerceApp.prototype.defaultpage = 'Home';
+
+    ECommerceApp.prototype.pages = {
+      'Home': {
+        section: 'Shop',
+        name: 'Home'
+      },
+      'Shop': {
+        section: 'Shop',
+        name: 'Shop'
+      },
+      'Shopping Cart': {
+        section: 'Shop',
+        name: 'Shopping Cart'
+      },
+      'Products': {
+        section: 'Products',
+        name: 'Products'
+      },
+      'Product Categories': {
+        section: 'Products',
+        name: 'Product Categories'
+      }
+    };
 
     return ECommerceApp;
 
-  })(Backbone.View);
-
-  ECommerceAppView = (function(_super) {
-
-    __extends(ECommerceAppView, _super);
-
-    function ECommerceAppView() {
-      ECommerceAppView.__super__.constructor.apply(this, arguments);
-    }
-
-    ECommerceAppView.prototype.template = _.template($('#ecommerce-app').html());
-
-    ECommerceAppView.prototype.initialize = function() {};
-
-    ECommerceAppView.prototype.render = function() {
-      return $(this.el).html(this.template({
-        name: 'eCommerce'
-      }));
-    };
-
-    return ECommerceAppView;
-
-  })(Backbone.View);
+  })(App);
 
   SettingsApp = (function(_super) {
 
     __extends(SettingsApp, _super);
 
+    function SettingsApp() {
+      SettingsApp.__super__.constructor.apply(this, arguments);
+    }
+
     SettingsApp.prototype.name = 'Settings';
 
-    function SettingsApp() {
-      this.view = (new SettingsAppView).render();
-    }
+    SettingsApp.prototype.defaultpage = 'Apps';
+
+    SettingsApp.prototype.pages = {
+      'Apps': {
+        section: 'Administration',
+        name: 'Apps'
+      },
+      'Users': {
+        section: 'Administration',
+        name: 'Users'
+      }
+    };
 
     return SettingsApp;
 
-  })(Backbone.View);
-
-  SettingsAppView = (function(_super) {
-
-    __extends(SettingsAppView, _super);
-
-    function SettingsAppView() {
-      SettingsAppView.__super__.constructor.apply(this, arguments);
-    }
-
-    SettingsAppView.prototype.template = _.template($('#settings-app').html());
-
-    SettingsAppView.prototype.initialize = function() {};
-
-    SettingsAppView.prototype.render = function() {
-      return $(this.el).html(this.template({
-        name: 'Settings'
-      }));
-    };
-
-    return SettingsAppView;
-
-  })(Backbone.View);
+  })(App);
 
   $(function() {
     window.openerp = new OpenERP();
