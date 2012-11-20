@@ -24,7 +24,8 @@
     OpenERP.prototype.logout = function() {};
 
     OpenERP.prototype.routes = {
-      'app/:app': 'loadApp'
+      'app/:app': 'loadApp',
+      'app/:app/:page': 'loadApp'
     };
 
     OpenERP.prototype.apps = {};
@@ -37,11 +38,11 @@
       return this.apps[app.name] = app;
     };
 
-    OpenERP.prototype.loadApp = function(app) {
+    OpenERP.prototype.loadApp = function(app, page) {
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
-      return this.apps[app].load();
+      return this.apps[app].loadPage(page);
     };
 
     return OpenERP;
@@ -193,7 +194,9 @@
 
     AppMenuItemView.prototype.navigate = function(e) {
       e.preventDefault();
-      return console.log(e.srcElement.pathname);
+      return openerp.navigate($(this.el).find('a').attr('href'), {
+        trigger: true
+      });
     };
 
     return AppMenuItemView;
@@ -207,8 +210,6 @@
     function AppMenuView() {
       AppMenuView.__super__.constructor.apply(this, arguments);
     }
-
-    AppMenuView.prototype.className = 'appMenu';
 
     AppMenuView.prototype.template = _.template($('#appmenu-section').html());
 
@@ -261,20 +262,17 @@
         this.views[k] = (new PageHeaderView(v)).render();
       }
       this.menu = (new AppMenuView(this)).render();
-      this.activepage = this.defaultpage;
-      this.loadPage(this.activepage);
+      this.loadPage(this.defaultpage);
     }
 
-    App.prototype.load = function() {
-      $('.content').html(this.views[this.activepage]);
-      return $('.appmenu').html(this.menu);
-    };
-
     App.prototype.loadPage = function(page) {
+      if (page) this.activepage = page;
       this.appMenu.each(function(i) {
         return i.set('active', i.get('name') === page);
       });
-      return this.activepage = page;
+      $('.content').empty().append(this.views[this.activepage]);
+      $('.appmenu > div').detach();
+      return $('.appmenu').append(this.menu);
     };
 
     return App;

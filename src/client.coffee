@@ -10,13 +10,14 @@ class OpenERP extends Backbone.Router
   logout: ->
   routes:
     'app/:app': 'loadApp'
+    'app/:app/:page': 'loadApp'
   apps: {}
   addApp: (app) ->
     @mainMenu.add({name: app.name, active: false})
     @apps[app.name] = app
-  loadApp: (app) =>
+  loadApp: (app, page) =>
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
-    @apps[app].load()
+    @apps[app].loadPage(page)
 
 # Main menu
 class MainMenuItemView extends Backbone.View
@@ -70,11 +71,9 @@ class AppMenuItemView extends Backbone.View
   render: => $(@el).html(@template @model.toJSON())
   navigate: (e) ->
     e.preventDefault()
-    console.log(e.srcElement.pathname)
-    #openerp.navigate($(@el).find('a').attr('href'), trigger: true)
+    openerp.navigate($(@el).find('a').attr('href'), trigger: true)
 
 class AppMenuView extends Backbone.View
-  className: 'appMenu'
   template: _.template $('#appmenu-section').html()
   initialize: (@app) ->
     @sections = {}
@@ -95,14 +94,13 @@ class App
       @appMenu.add(new Backbone.Model(v))
       @views[k] = (new PageHeaderView(v)).render()
     @menu = (new AppMenuView(@)).render()
-    @activepage = @defaultpage
-    @loadPage(@activepage)
-  load: ->
-    $('.content').html(@views[@activepage])
-    $('.appmenu').html(@menu)
+    @loadPage(@defaultpage)
   loadPage: (page) ->
+    @activepage = page if page
     @appMenu.each (i) -> i.set('active', i.get('name') is page)
-    @activepage = page
+    $('.content').empty().append(@views[@activepage])
+    $('.appmenu > div').detach()
+    $('.appmenu').append(@menu)
 
 class SalesApp extends App
   name: 'Sales'
