@@ -63,7 +63,7 @@
     MainMenuItemView.prototype.template = _.template($('#mainmenu-item').html());
 
     MainMenuItemView.prototype.initialize = function() {
-      return this.model.bind('all', this.render);
+      return this.model.bind('change', this.render);
     };
 
     MainMenuItemView.prototype.events = {
@@ -181,7 +181,7 @@
     AppMenuItemView.prototype.template = _.template($('#appmenu-item').html());
 
     AppMenuItemView.prototype.initialize = function() {
-      return this.model.bind('all', this.render);
+      return this.model.bind('change', this.render);
     };
 
     AppMenuItemView.prototype.events = {
@@ -214,24 +214,21 @@
     AppMenuView.prototype.template = _.template($('#appmenu-section').html());
 
     AppMenuView.prototype.initialize = function(app) {
-      var k, v, _ref, _results;
+      var _this = this;
       this.app = app;
       this.sections = {};
-      _ref = this.app.pages;
-      _results = [];
-      for (k in _ref) {
-        v = _ref[k];
-        v.app = this.app.name;
-        if (!this.sections[v.section]) {
-          this.sections[v.section] = $(this.template({
-            section: k
+      return this.app.appMenu.each(function(p) {
+        var s;
+        s = p.get('section');
+        if (!_this.sections[s]) {
+          _this.sections[s] = $(_this.template({
+            section: s
           }));
         }
-        _results.push(this.sections[v.section].append((new AppMenuItemView({
-          model: new Backbone.Model(v)
-        })).render()));
-      }
-      return _results;
+        return _this.sections[s].append((new AppMenuItemView({
+          model: p
+        })).render());
+      });
     };
 
     AppMenuView.prototype.render = function() {
@@ -258,7 +255,8 @@
       for (k in _ref) {
         v = _ref[k];
         v.active = false;
-        this.appMenu.add(new Backbone.Model(v));
+        v.app = this.name;
+        this.appMenu.add(v);
         this.views[k] = (new PageHeaderView(v)).render();
       }
       this.menu = (new AppMenuView(this)).render();
@@ -266,9 +264,10 @@
     }
 
     App.prototype.loadPage = function(page) {
+      var _this = this;
       if (page) this.activepage = page;
       this.appMenu.each(function(i) {
-        return i.set('active', i.get('name') === page);
+        return i.set('active', i.get('name') === _this.activepage);
       });
       $('.content').empty().append(this.views[this.activepage]);
       $('.appmenu > div').detach();

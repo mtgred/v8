@@ -23,7 +23,7 @@ class OpenERP extends Backbone.Router
 class MainMenuItemView extends Backbone.View
   className: 'menuItem'
   template: _.template $('#mainmenu-item').html()
-  initialize: -> @model.bind('all', @render)
+  initialize: -> @model.bind('change', @render)
   events: 'click': 'navigate'
   render: => $(@el).html(@template @model.toJSON())
   navigate: (e) ->
@@ -66,7 +66,7 @@ class PageHeaderView extends Backbone.View
 class AppMenuItemView extends Backbone.View
   className: 'appMenuItem'
   template: _.template $('#appmenu-item').html()
-  initialize: -> @model.bind('all', @render)
+  initialize: -> @model.bind('change', @render)
   events: 'click': 'navigate'
   render: => $(@el).html(@template @model.toJSON())
   navigate: (e) ->
@@ -77,10 +77,10 @@ class AppMenuView extends Backbone.View
   template: _.template $('#appmenu-section').html()
   initialize: (@app) ->
     @sections = {}
-    for k, v of @app.pages
-      v.app = @app.name
-      @sections[v.section] = $(@template(section: k)) unless @sections[v.section]
-      @sections[v.section].append (new AppMenuItemView(model: new Backbone.Model(v))).render()
+    @app.appMenu.each (p) =>
+      s = p.get('section')
+      @sections[s] = $(@template(section: s)) unless @sections[s]
+      @sections[s].append (new AppMenuItemView(model: p)).render()
   render: ->
     $(@el).append(v) for k, v of @sections
     @el
@@ -91,13 +91,14 @@ class App
     @appMenu = new Backbone.Collection
     for k, v of @pages
       v.active = false
-      @appMenu.add(new Backbone.Model(v))
+      v.app = @name
+      @appMenu.add(v)
       @views[k] = (new PageHeaderView(v)).render()
     @menu = (new AppMenuView(@)).render()
     @loadPage(@defaultpage)
   loadPage: (page) ->
     @activepage = page if page
-    @appMenu.each (i) -> i.set('active', i.get('name') is page)
+    @appMenu.each (i) => i.set('active', i.get('name') is @activepage)
     $('.content').empty().append(@views[@activepage])
     $('.appmenu > div').detach()
     $('.appmenu').append(@menu)
