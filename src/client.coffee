@@ -42,14 +42,15 @@ class MainMenuView extends Backbone.View
     @collection.each (i) => @addItem(i)
 
 # Apps
-class PageHeaderView extends Backbone.View
+class PageView extends Backbone.View
   template: _.template $('#page-header').html()
   initialize: (@page) ->
   events:
     'keyup .searchbox': 'filter'
     'click .searchclear': 'searchclear'
   render: ->
-    $(@el).html(@template(name: @page.name))
+    pagetemplate = _.template $("##{@page.app}-#{@page.name.replace(/\s/g, '')}").html()
+    $(@el).html(@template(name: @page.name)).append(pagetemplate())
   filter: =>
     s = $('.search').val().toLowerCase()
     if s
@@ -93,14 +94,15 @@ class App
       v.active = false
       v.app = @name
       @appMenu.add(v)
-      @views[k] = (new PageHeaderView(v)).render()
+      @views[k] = (new PageView(v)).render()
     @menu = (new AppMenuView(@)).render()
     @loadPage(@defaultpage)
   loadPage: (page) ->
     @activepage = page if page
     @appMenu.each (i) => i.set('active', i.get('name') is @activepage)
-    $('.content').empty().append(@views[@activepage])
+    $('.content > div').detach()
     $('.appmenu > div').detach()
+    $('.content').append(@views[@activepage])
     $('.appmenu').append(@menu)
 
 class SalesApp extends App

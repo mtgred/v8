@@ -17,7 +17,6 @@ block body
         span.oe_e.search-icon &ocirc;
         input.search(placeholder="Search...") 
         span.oe_e.searchclear [
-    div.page <%= name %>
 
   script(type="text/template", id="mainmenu-item")
     a(href!="/app/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
@@ -29,17 +28,38 @@ block body
     div.section
       h4 <%= section %>
 
-  script(type="text/template", id="ecommerce-home")
+  script(type="text/template", id="Sales-Customers")
+    div Clients
+
+  script(type="text/template", id="Sales-Leads")
+    div Leads
+
+  script(type="text/template", id="Sales-Opportunities")
+    div Opportunities
+
+  script(type="text/template", id="Sales-Quotations")
+    div Quotations
+
+  script(type="text/template", id="Sales-SaleOrders")
+    div Commandes
+
+  script(type="text/template", id="eCommerce-Home")
     div Vitrine et Promo
 
-  script(type="text/template", id="ecommerce-shop")
+  script(type="text/template", id="eCommerce-Shop")
     div Magasin
 
-  script(type="text/template", id="ecommerce-shoppingcart")
+  script(type="text/template", id="eCommerce-ShoppingCart")
     div Caddy
 
-  script(type="text/template", id="ecommerce-products")
+  script(type="text/template", id="eCommerce-Products")
     div Produits
 
-  script(type="text/template", id="ecommerce-productcategories")
+  script(type="text/template", id="eCommerce-ProductCategories")
     div Categories de Produit
+
+  script(type="text/template", id="Settings-Apps")
+    div Applications
+
+  script(type="text/template", id="Settings-Users")
+    div Utilisateurs

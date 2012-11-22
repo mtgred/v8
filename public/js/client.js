@@ -1,5 +1,5 @@
 (function() {
-  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageHeaderView, SalesApp, SettingsApp,
+  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
@@ -120,34 +120,36 @@
 
   })(Backbone.View);
 
-  PageHeaderView = (function(_super) {
+  PageView = (function(_super) {
 
-    __extends(PageHeaderView, _super);
+    __extends(PageView, _super);
 
-    function PageHeaderView() {
+    function PageView() {
       this.searchclear = __bind(this.searchclear, this);
       this.filter = __bind(this.filter, this);
-      PageHeaderView.__super__.constructor.apply(this, arguments);
+      PageView.__super__.constructor.apply(this, arguments);
     }
 
-    PageHeaderView.prototype.template = _.template($('#page-header').html());
+    PageView.prototype.template = _.template($('#page-header').html());
 
-    PageHeaderView.prototype.initialize = function(page) {
+    PageView.prototype.initialize = function(page) {
       this.page = page;
     };
 
-    PageHeaderView.prototype.events = {
+    PageView.prototype.events = {
       'keyup .searchbox': 'filter',
       'click .searchclear': 'searchclear'
     };
 
-    PageHeaderView.prototype.render = function() {
+    PageView.prototype.render = function() {
+      var pagetemplate;
+      pagetemplate = _.template($("#" + this.page.app + "-" + (this.page.name.replace(/\s/g, ''))).html());
       return $(this.el).html(this.template({
         name: this.page.name
-      }));
+      })).append(pagetemplate());
     };
 
-    PageHeaderView.prototype.filter = function() {
+    PageView.prototype.filter = function() {
       var s;
       s = $('.search').val().toLowerCase();
       if (s) {
@@ -157,13 +159,13 @@
       }
     };
 
-    PageHeaderView.prototype.searchclear = function() {
+    PageView.prototype.searchclear = function() {
       $('.searchclear').fadeOut('fast');
       $('.search').val('').focus();
       return this.render();
     };
 
-    return PageHeaderView;
+    return PageView;
 
   })(Backbone.View);
 
@@ -257,7 +259,7 @@
         v.active = false;
         v.app = this.name;
         this.appMenu.add(v);
-        this.views[k] = (new PageHeaderView(v)).render();
+        this.views[k] = (new PageView(v)).render();
       }
       this.menu = (new AppMenuView(this)).render();
       this.loadPage(this.defaultpage);
@@ -269,8 +271,9 @@
       this.appMenu.each(function(i) {
         return i.set('active', i.get('name') === _this.activepage);
       });
-      $('.content').empty().append(this.views[this.activepage]);
+      $('.content > div').detach();
       $('.appmenu > div').detach();
+      $('.content').append(this.views[this.activepage]);
       return $('.appmenu').append(this.menu);
     };
 
