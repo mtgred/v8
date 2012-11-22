@@ -117,9 +117,8 @@ class SalesApp extends App
 
 class ECommerceApp extends App
   name: 'eCommerce'
-  defaultpage: 'Home'
+  defaultpage: 'Shop'
   pages:
-    'Home': {section: 'Shop', name: 'Home'}
     'Shop': {section: 'Shop', name: 'Shop'}
     'Shopping Cart': {section: 'Shop', name: 'Shopping Cart'}
     'Products': {section: 'Products', name: 'Products'}

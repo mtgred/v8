@@ -1,12 +1,44 @@
+@charset "UTF-8";
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  font-family: 'fontello';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: 0.2em;
+  text-align: center;
+  opacity: 0.8;
+/* Uncomment for 3D effect */
+/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3) */
+/* fix buttons height */
+  line-height: 1em;
+/* you can be more comfortable with increased icons size */
+/* font-size: 120% */
+}
 @font-face {
-  font-family: 'EntypoRegular';
-  src: url("../font/entypo-webfont.eot") format('eot');
-  src: url("../font/entypo-webfont.eot?#iefix") format('embedded-opentype');
-  src: url("../font/entypo-webfont.woff") format('woff');
-  src: url("../font/entypo-webfont.ttf") format('truetype');
-  src: url("../font/entypo-webfont.svg") format('svg') active;
+  font-family: 'entypo';
+  src: url("../font/entypo.eot") format('eot');
+  src: url("../font/entypo.eot?#iefix") format('embedded-opentype');
+  src: url("../font/entypo.woff") format('woff');
+  src: url("../font/entypo.ttf") format('truetype');
+  src: url("../font/entypo.svg") format('svg') active;
   font-weight: normal;
   font-style: normal;
+}
+.oe_e {
+  font-family: "entypo" !important;
+  font-size: 24px;
+  font-weight: 300 !important;
+  speak: none;
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: 0.2em;
+  text-align: center;
+  opacity: 0.8;
 }
 * {
   -moz-box-sizing: border-box;
@@ -66,11 +98,6 @@ textarea {
   height: 0;
   visibility: hidden;
   font-size: 0;
-}
-.oe_e {
-  font-family: "entypoRegular" !important;
-  font-size: 36px;
-  font-weight: 300 !important;
 }
 .frame-header {
   position: absolute;
@@ -201,11 +228,9 @@ textarea {
 .openerp .pageHeader .searchbox .search-icon {
   position: absolute;
   color: #888;
-  top: -1px;
-  left: 5px;
-  font-size: 28px;
-  font-family: "entypoRegular" !important;
-  font-weight: 300 !important;
+  top: 5px;
+  left: 4px;
+  font-size: 16px;
 }
 .openerp .pageHeader .searchbox .searchclear {
   display: none;

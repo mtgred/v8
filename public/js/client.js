@@ -330,13 +330,9 @@
 
     ECommerceApp.prototype.name = 'eCommerce';
 
-    ECommerceApp.prototype.defaultpage = 'Home';
+    ECommerceApp.prototype.defaultpage = 'Shop';
 
     ECommerceApp.prototype.pages = {
-      'Home': {
-        section: 'Shop',
-        name: 'Home'
-      },
       'Shop': {
         section: 'Shop',
         name: 'Shop'

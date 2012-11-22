@@ -14,7 +14,7 @@ block body
     div.pageHeader.clearfix
       h2 <%= name %>
       div.searchbox
-        span.oe_e.search-icon &ocirc;
+        span.oe_e.search-icon &#128269;
         input.search(placeholder="Search...") 
         span.oe_e.searchclear [
 
@@ -43,12 +43,6 @@ block body
   script(type="text/template", id="Sales-SaleOrders")
     div Commandes
 
-  script(type="text/template", id="eCommerce-Home")
-    div Vitrine et Promo
-
-  script(type="text/template", id="eCommerce-Shop")
-    div Magasin
-
   script(type="text/template", id="eCommerce-ShoppingCart")
     div Caddy
 
@@ -63,3 +57,13 @@ block body
 
   script(type="text/template", id="Settings-Users")
     div Utilisateurs
+
+  script(type="text/template", id="eCommerce-Shop")
+    div.container
+      div.categories
+        div.category Sofas
+        div.category Tables
+        div.category Shelves
+      div.products
+
+
