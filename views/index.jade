@@ -19,10 +19,10 @@ block body
         span.oe_e.searchclear [
 
   script(type="text/template", id="mainmenu-item")
-    a(href!="/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
+    a(href!="/app/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
 
   script(type="text/template", id="appmenu-item")
-    a(href!="/<%= app %>/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
+    a(href!="/app/<%= app %>/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
 
   script(type="text/template", id="appmenu-section")
     div.section
@@ -59,22 +59,26 @@ block body
     div Utilisateurs
 
   script(type="text/template", id="eCommerce-Shop")
+    | foobar
+
+
+  script(type="text/template", id="eCommerce-Home")
     div.container
       div.col2
         div.categories.pane
-          a.category(href="")
+          a.category(href="category/sofas")
             img(src="/eCommerce/img/sofas.jpg")
             h3 Sofas
-          a.category(href="")
+          a.category(href="category/tables")
             img(src="/eCommerce/img/tables.jpg")
             h3 Tables
-          a.category(href="")
+          a.category(href="category/chairs")
             img(src="/eCommerce/img/chairs.jpg")
             h3 Chairs
-          a.category(href="")
+          a.category(href="category/shelves")
             img(src="/eCommerce/img/shelves.jpg")
             h3 Shelves
-          a.category(href="")
+          a.category(href="category/beds")
             img(src="/eCommerce/img/beds.jpg")
             h3 Beds
         div.pane

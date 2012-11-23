@@ -1,15 +1,16 @@
 (function() {
-  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, SalesApp, SettingsApp,
+  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductsView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
+    __slice = Array.prototype.slice;
 
   OpenERP = (function(_super) {
 
     __extends(OpenERP, _super);
 
     function OpenERP(options) {
-      this.loadApp = __bind(this.loadApp, this);      OpenERP.__super__.constructor.call(this, options);
+      this.loadPage = __bind(this.loadPage, this);      OpenERP.__super__.constructor.call(this, options);
       this.mainMenu = new Backbone.Collection;
       this.mainMenuView = new MainMenuView({
         collection: this.mainMenu
@@ -24,8 +25,7 @@
     OpenERP.prototype.logout = function() {};
 
     OpenERP.prototype.routes = {
-      ':app': 'loadApp',
-      ':app/:page': 'loadApp'
+      'app/*param': 'loadPage'
     };
 
     OpenERP.prototype.apps = {};
@@ -38,7 +38,9 @@
       return this.apps[app.name] = app;
     };
 
-    OpenERP.prototype.loadApp = function(app, page) {
+    OpenERP.prototype.loadPage = function(param) {
+      var app, args, page, _ref;
+      _ref = param.split("/"), app = _ref[0], page = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
       if (!page) {
         this.navigate("" + app + "/" + this.apps[app].activepage, {
           trigger: false
@@ -47,7 +49,7 @@
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
-      return this.apps[app].loadPage(page);
+      return this.apps[app].navigate(page, args);
     };
 
     return OpenERP;
@@ -267,11 +269,13 @@
         this.views[k] = (new PageView(v)).render();
       }
       this.menu = (new AppMenuView(this)).render();
-      this.loadPage(this.defaultpage);
+      this.navigate(this.defaultpage);
     }
 
-    App.prototype.loadPage = function(page) {
-      var _this = this;
+    App.prototype.navigate = function() {
+      var arg, page,
+        _this = this;
+      page = arguments[0], arg = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (page) this.activepage = page;
       this.appMenu.each(function(i) {
         return i.set('active', i.get('name') === _this.activepage);
@@ -338,6 +342,10 @@
     ECommerceApp.prototype.defaultpage = 'Shop';
 
     ECommerceApp.prototype.pages = {
+      'Home': {
+        section: 'Shop',
+        name: 'Home'
+      },
       'Shop': {
         section: 'Shop',
         name: 'Shop'
@@ -359,6 +367,18 @@
     return ECommerceApp;
 
   })(App);
+
+  ProductsView = (function(_super) {
+
+    __extends(ProductsView, _super);
+
+    function ProductsView() {
+      ProductsView.__super__.constructor.apply(this, arguments);
+    }
+
+    return ProductsView;
+
+  })(Backbone.View);
 
   SettingsApp = (function(_super) {
 

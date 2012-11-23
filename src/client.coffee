@@ -8,17 +8,16 @@ class OpenERP extends Backbone.Router
     @addApp(new SettingsApp)
   login: ->
   logout: ->
-  routes:
-    ':app': 'loadApp'
-    ':app/:page': 'loadApp'
+  routes: 'app/*param': 'loadPage'
   apps: {}
   addApp: (app) ->
     @mainMenu.add({name: app.name, active: false})
     @apps[app.name] = app
-  loadApp: (app, page) =>
+  loadPage: (param) =>
+    [app, page, args...] = param.split("/")
     @navigate("#{app}/#{@apps[app].activepage}", trigger: false) unless page
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
-    @apps[app].loadPage(page)
+    @apps[app].navigate(page, args)
 
 # Main menu
 class MainMenuItemView extends Backbone.View
@@ -97,8 +96,8 @@ class App
       @appMenu.add(v)
       @views[k] = (new PageView(v)).render()
     @menu = (new AppMenuView(@)).render()
-    @loadPage(@defaultpage)
-  loadPage: (page) ->
+    @navigate(@defaultpage)
+  navigate: (page, arg...) ->
     @activepage = page if page
     @appMenu.each (i) => i.set('active', i.get('name') is @activepage)
     $('.content > div').detach()
@@ -116,15 +115,20 @@ class SalesApp extends App
     'Quotations': {section: 'Sales', name: 'Quotations'}
     'Sale Orders': {section: 'Sales', name: 'Sale Orders'}
 
+# eEcommerce
 class ECommerceApp extends App
   name: 'eCommerce'
   defaultpage: 'Shop'
   pages:
+    'Home': {section: 'Shop', name: 'Home'}
     'Shop': {section: 'Shop', name: 'Shop'}
     'Shopping Cart': {section: 'Shop', name: 'Shopping Cart'}
     'Products': {section: 'Configuration', name: 'Products'}
     'Product Categories': {section: 'Configuration', name: 'Product Categories'}
 
+class ProductsView extends Backbone.View
+
+# Settings
 class SettingsApp extends App
   name: 'Settings'
   defaultpage: 'Apps'
