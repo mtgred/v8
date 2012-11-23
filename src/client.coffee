@@ -9,13 +9,14 @@ class OpenERP extends Backbone.Router
   login: ->
   logout: ->
   routes:
-    'app/:app': 'loadApp'
-    'app/:app/:page': 'loadApp'
+    ':app': 'loadApp'
+    ':app/:page': 'loadApp'
   apps: {}
   addApp: (app) ->
     @mainMenu.add({name: app.name, active: false})
     @apps[app.name] = app
   loadApp: (app, page) =>
+    @navigate("#{app}/#{@apps[app].activepage}", trigger: false) unless page
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
     @apps[app].loadPage(page)
 
@@ -121,8 +122,8 @@ class ECommerceApp extends App
   pages:
     'Shop': {section: 'Shop', name: 'Shop'}
     'Shopping Cart': {section: 'Shop', name: 'Shopping Cart'}
-    'Products': {section: 'Products', name: 'Products'}
-    'Product Categories': {section: 'Products', name: 'Product Categories'}
+    'Products': {section: 'Configuration', name: 'Products'}
+    'Product Categories': {section: 'Configuration', name: 'Product Categories'}
 
 class SettingsApp extends App
   name: 'Settings'

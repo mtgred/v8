@@ -1,23 +1,4 @@
 @charset "UTF-8";
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-  font-family: 'fontello';
-  font-style: normal;
-  font-weight: normal;
-  speak: none;
-  display: inline-block;
-  text-decoration: inherit;
-  width: 1em;
-  margin-right: 0.2em;
-  text-align: center;
-  opacity: 0.8;
-/* Uncomment for 3D effect */
-/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3) */
-/* fix buttons height */
-  line-height: 1em;
-/* you can be more comfortable with increased icons size */
-/* font-size: 120% */
-}
 @font-face {
   font-family: 'entypo';
   src: url("../font/entypo.eot") format('eot');
@@ -56,13 +37,9 @@ body {
 a {
   text-decoration: none;
 }
-ul,
-ol {
+ul {
   padding: 0;
   margin: 0;
-}
-li {
-  list-style-type: none;
 }
 form {
   margin: 0;
@@ -235,9 +212,9 @@ textarea {
 .openerp .pageHeader .searchbox .searchclear {
   display: none;
   position: absolute;
-  right: 6px;
-  top: 0;
-  font-size: 26px;
+  right: -5px;
+  top: -4px;
+  font-size: 27px;
   color: #b6b6b6;
   cursor: pointer;
 }
@@ -339,4 +316,58 @@ textarea {
   right: 0;
   top: 0;
   bottom: 0;
+  vertical-align: top;
+  overflow: auto;
+}
+.openerp .pane {
+  position: relative;
+  margin: 8px;
+  border: solid 1px #afafb6;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+.openerp .pane .fullwidth {
+  width: 100%;
+}
+.openerp .pane .overlay {
+  position: absolute;
+  width: 100%;
+  color: #4c4c4c;
+}
+.openerp .pane h1,
+.openerp .pane h2,
+.openerp .pane h3 {
+  text-align: center;
+}
+.openerp .col2 {
+  width: 643px;
+  display: inline-block;
+  vertical-align: top;
+}
+.openerp .col1 {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+}
+.openerp .category {
+  display: inline-block;
+  padding: 4px;
+  width: 125px;
+  height: 125px;
+  text-align: center;
+  border: 1px solid #fff;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+.openerp .category img {
+  width: 100px;
+  height: 100px;
+}
+.openerp .category h3 {
+  margin: 0 0 2px 0;
+}
+.openerp .category:hover {
+  border: 1px solid #7c7bad;
 }

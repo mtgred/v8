@@ -40,26 +40,6 @@ border-color = #AFAFB6
 focus-color = #a6a6fe
 purple = #7C7BAD
 
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-  font-family: 'fontello'
-  font-style: normal
-  font-weight: normal
-  speak: none
-  display: inline-block
-  text-decoration: inherit
-  width: 1em
-  margin-right: 0.2em
-  text-align: center
-  opacity: 0.8
-/* Uncomment for 3D effect */
-/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3) */
-/* fix buttons height */
-  line-height: 1em
-/* you can be more comfortable with increased icons size */
-/* font-size: 120% */
-}
-
 @font-face
   font-family: 'entypo'
   src: url('../font/entypo.eot') format('eot')
@@ -107,12 +87,9 @@ body
 a
   text-decoration: none
 
-ul, ol
+ul
   padding: 0
   margin: 0
-
-li
-  list-style-type: none
 
 form
   margin: 0
@@ -248,9 +225,9 @@ input, textarea
       .searchclear
         display: none
         position: absolute
-        right: 6px
-        top: 0
-        font-size: 26px
+        right: -5px
+        top: -4px
+        font-size: 27px
         color: #b6b6b6
         cursor: pointer
         &:hover
@@ -328,4 +305,45 @@ input, textarea
     right: 0
     top: 0
     bottom: 0
+    vertical-align: top
+    overflow: auto
 
+  .pane
+    position: relative
+    margin: 8px
+    border: solid 1px border-color
+    radius(4px)
+    .fullwidth
+      width: 100%
+    .overlay
+      position: absolute
+      width: 100%
+      color: #4c4c4c
+    h1, h2, h3
+      text-align: center
+
+  .col2
+    width: 643px
+    display: inline-block
+    vertical-align: top
+
+  .col1
+    width: 200px
+    display: inline-block
+    vertical-align: top
+
+  .category
+    display: inline-block
+    padding: 4px
+    width: 125px
+    height: 125px
+    text-align: center
+    border: 1px solid white
+    radius 4px
+    img
+      width: 100px
+      height: 100px
+    h3
+      margin: 0 0 2px 0
+    &:hover
+      border: 1px solid purple

@@ -24,8 +24,8 @@
     OpenERP.prototype.logout = function() {};
 
     OpenERP.prototype.routes = {
-      'app/:app': 'loadApp',
-      'app/:app/:page': 'loadApp'
+      ':app': 'loadApp',
+      ':app/:page': 'loadApp'
     };
 
     OpenERP.prototype.apps = {};
@@ -39,6 +39,11 @@
     };
 
     OpenERP.prototype.loadApp = function(app, page) {
+      if (!page) {
+        this.navigate("" + app + "/" + this.apps[app].activepage, {
+          trigger: false
+        });
+      }
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
@@ -342,11 +347,11 @@
         name: 'Shopping Cart'
       },
       'Products': {
-        section: 'Products',
+        section: 'Configuration',
         name: 'Products'
       },
       'Product Categories': {
-        section: 'Products',
+        section: 'Configuration',
         name: 'Product Categories'
       }
     };
