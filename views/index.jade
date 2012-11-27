@@ -46,6 +46,8 @@ block body
   script(type="text/template", id="eCommerce-ShoppingCart")
     div Caddy
 
+  script(type="text/template", id="eCommerce-Shop")
+
   script(type="text/template", id="eCommerce-Products")
     div Produits
 
@@ -58,27 +60,33 @@ block body
   script(type="text/template", id="Settings-Users")
     div Utilisateurs
 
-  script(type="text/template", id="eCommerce-Shop")
-    | foobar
-
+  script(type="text/template", id="gallery-View")
+    div.gallery
+      <% _.each(products, function(p) { %>
+      a.product(href!="/app/eCommerce/product/<%= p.name %>")
+        img(src!="/eCommerce/img/products/<%= p.name %>.jpg")
+        div.name <%= p.name %>
+        div.description <%= p.shortDescription %>
+        div.price &euro; <%= p.price %>
+      <% }); %>
 
   script(type="text/template", id="eCommerce-Home")
-    div.container
+    div.home
       div.col2
         div.categories.pane
-          a.category(href="category/sofas")
+          a.category(href="shop/sofas")
             img(src="/eCommerce/img/sofas.jpg")
             h3 Sofas
-          a.category(href="category/tables")
+          a.category(href="shop/tables")
             img(src="/eCommerce/img/tables.jpg")
             h3 Tables
-          a.category(href="category/chairs")
+          a.category(href="shop/chairs")
             img(src="/eCommerce/img/chairs.jpg")
             h3 Chairs
-          a.category(href="category/shelves")
+          a.category(href="shop/shelves")
             img(src="/eCommerce/img/shelves.jpg")
             h3 Shelves
-          a.category(href="category/beds")
+          a.category(href="shop/beds")
             img(src="/eCommerce/img/beds.jpg")
             h3 Beds
         div.pane
@@ -96,5 +104,4 @@ block body
             li Foo
             li Foo
             li Foo
-
 

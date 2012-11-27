@@ -15,7 +15,7 @@ class OpenERP extends Backbone.Router
     @apps[app.name] = app
   loadPage: (param) =>
     [app, page, args...] = param.split("/")
-    @navigate("#{app}/#{@apps[app].activepage}", trigger: false) unless page
+    @navigate("/app/#{app}/#{@apps[app].activepage}", trigger: false, replace: true) unless page
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
     @apps[app].navigate(page, args)
 
@@ -121,12 +121,30 @@ class ECommerceApp extends App
   defaultpage: 'Shop'
   pages:
     'Home': {section: 'Shop', name: 'Home'}
-    'Shop': {section: 'Shop', name: 'Shop'}
+    'Shop': {section: 'Shop', name: 'Shop', view: ProductsView}
     'Shopping Cart': {section: 'Shop', name: 'Shopping Cart'}
     'Products': {section: 'Configuration', name: 'Products'}
     'Product Categories': {section: 'Configuration', name: 'Product Categories'}
+  constructor: ->
+    super()
+    @views['Shop'] = (new ProductsView).render()
 
 class ProductsView extends Backbone.View
+  className: 'galleryView'
+  headerTemplate: _.template $('#page-header').html()
+  galleryTemplate: _.template $('#gallery-View').html()
+  initialize: (@category) ->
+    @category = "Shop" unless @category
+    @collection = new Backbone.Collection
+    @collection.url = "/data/products"
+    @collection.bind('reset', @render)
+    @collection.fetch()
+  events: 'click': 'navigate'
+  render: =>
+    $(@el).html(@headerTemplate(name: @category)).append(@galleryTemplate {products: @collection.toJSON()})
+  navigate: (e) ->
+    e.preventDefault()
+    openerp.navigate($(@el).find('a').attr('href'), trigger: true)
 
 # Settings
 class SettingsApp extends App

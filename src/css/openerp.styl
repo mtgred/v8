@@ -39,6 +39,7 @@ lightgrey-background = #F0EEEE
 border-color = #AFAFB6
 focus-color = #a6a6fe
 purple = #7C7BAD
+text-color =#4c4c4c
 
 @font-face
   font-family: 'entypo'
@@ -77,7 +78,7 @@ purple = #7C7BAD
 
 body
   padding-top: 36px
-  color: #4c4c4c
+  color: text-color
   //font-family: Lato, Helvetica, sans-serif
   font-family: "Lucida Grande", Helvetica, Verdana, Arial, sans-serif
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5)
@@ -281,7 +282,7 @@ input, textarea
           color: purple
         a
           display: block
-          color: #4C4C4C
+          color: text-color
           padding: 2px 0 2px 16px
         .active
           border-top: 1px solid lightGray
@@ -310,7 +311,7 @@ input, textarea
 
   .pane
     position: relative
-    margin: 8px
+    margin: 0 8px 8px 0
     border: solid 1px border-color
     radius(4px)
     .fullwidth
@@ -318,19 +319,9 @@ input, textarea
     .overlay
       position: absolute
       width: 100%
-      color: #4c4c4c
+      color: text-color
     h1, h2, h3
       text-align: center
-
-  .col2
-    width: 643px
-    display: inline-block
-    vertical-align: top
-
-  .col1
-    width: 200px
-    display: inline-block
-    vertical-align: top
 
   .category
     display: inline-block
@@ -340,6 +331,7 @@ input, textarea
     text-align: center
     border: 1px solid white
     radius 4px
+    color: text-color
     img
       width: 100px
       height: 100px
@@ -347,3 +339,34 @@ input, textarea
       margin: 0 0 2px 0
     &:hover
       border: 1px solid purple
+
+  .gallery
+    padding: 8px
+    .product
+      vertical-align: top
+      display: inline-block
+      width: 165px
+      height: 250px
+      margin: 0 8px 8px 0
+      text-align: center
+      color: text-color
+      > img
+        width: 160px
+      .name, .description, .price, button
+        text-align: left
+        margin-bottom: 2px
+      .name, .price
+        font-size: 16px
+        font-weight: bold
+      
+  .home
+    padding: 8px
+    .col2
+      width: 643px
+      display: inline-block
+      vertical-align: top
+    .col1
+      width: 200px
+      display: inline-block
+      vertical-align: top
+

@@ -321,7 +321,7 @@ textarea {
 }
 .openerp .pane {
   position: relative;
-  margin: 8px;
+  margin: 0 8px 8px 0;
   border: solid 1px #afafb6;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
@@ -340,16 +340,6 @@ textarea {
 .openerp .pane h3 {
   text-align: center;
 }
-.openerp .col2 {
-  width: 643px;
-  display: inline-block;
-  vertical-align: top;
-}
-.openerp .col1 {
-  width: 200px;
-  display: inline-block;
-  vertical-align: top;
-}
 .openerp .category {
   display: inline-block;
   padding: 4px;
@@ -360,6 +350,7 @@ textarea {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
+  color: #4c4c4c;
 }
 .openerp .category img {
   width: 100px;
@@ -370,4 +361,44 @@ textarea {
 }
 .openerp .category:hover {
   border: 1px solid #7c7bad;
+}
+.openerp .gallery {
+  padding: 8px;
+}
+.openerp .gallery .product {
+  vertical-align: top;
+  display: inline-block;
+  width: 165px;
+  height: 250px;
+  margin: 0 8px 8px 0;
+  text-align: center;
+  color: #4c4c4c;
+}
+.openerp .gallery .product > img {
+  width: 160px;
+}
+.openerp .gallery .product .name,
+.openerp .gallery .product .description,
+.openerp .gallery .product .price,
+.openerp .gallery .product button {
+  text-align: left;
+  margin-bottom: 2px;
+}
+.openerp .gallery .product .name,
+.openerp .gallery .product .price {
+  font-size: 16px;
+  font-weight: bold;
+}
+.openerp .home {
+  padding: 8px;
+}
+.openerp .home .col2 {
+  width: 643px;
+  display: inline-block;
+  vertical-align: top;
+}
+.openerp .home .col1 {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
 }

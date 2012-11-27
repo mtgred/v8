@@ -42,8 +42,9 @@
       var app, args, page, _ref;
       _ref = param.split("/"), app = _ref[0], page = _ref[1], args = 3 <= _ref.length ? __slice.call(_ref, 2) : [];
       if (!page) {
-        this.navigate("" + app + "/" + this.apps[app].activepage, {
-          trigger: false
+        this.navigate("/app/" + app + "/" + this.apps[app].activepage, {
+          trigger: false,
+          replace: true
         });
       }
       this.mainMenu.each(function(i) {
@@ -333,10 +334,6 @@
 
     __extends(ECommerceApp, _super);
 
-    function ECommerceApp() {
-      ECommerceApp.__super__.constructor.apply(this, arguments);
-    }
-
     ECommerceApp.prototype.name = 'eCommerce';
 
     ECommerceApp.prototype.defaultpage = 'Shop';
@@ -348,7 +345,8 @@
       },
       'Shop': {
         section: 'Shop',
-        name: 'Shop'
+        name: 'Shop',
+        view: ProductsView
       },
       'Shopping Cart': {
         section: 'Shop',
@@ -364,6 +362,11 @@
       }
     };
 
+    function ECommerceApp() {
+      ECommerceApp.__super__.constructor.call(this);
+      this.views['Shop'] = (new ProductsView).render();
+    }
+
     return ECommerceApp;
 
   })(App);
@@ -373,8 +376,43 @@
     __extends(ProductsView, _super);
 
     function ProductsView() {
+      this.render = __bind(this.render, this);
       ProductsView.__super__.constructor.apply(this, arguments);
     }
+
+    ProductsView.prototype.className = 'galleryView';
+
+    ProductsView.prototype.headerTemplate = _.template($('#page-header').html());
+
+    ProductsView.prototype.galleryTemplate = _.template($('#gallery-View').html());
+
+    ProductsView.prototype.initialize = function(category) {
+      this.category = category;
+      if (!this.category) this.category = "Shop";
+      this.collection = new Backbone.Collection;
+      this.collection.url = "/data/products";
+      this.collection.bind('reset', this.render);
+      return this.collection.fetch();
+    };
+
+    ProductsView.prototype.events = {
+      'click': 'navigate'
+    };
+
+    ProductsView.prototype.render = function() {
+      return $(this.el).html(this.headerTemplate({
+        name: this.category
+      })).append(this.galleryTemplate({
+        products: this.collection.toJSON()
+      }));
+    };
+
+    ProductsView.prototype.navigate = function(e) {
+      e.preventDefault();
+      return openerp.navigate($(this.el).find('a').attr('href'), {
+        trigger: true
+      });
+    };
 
     return ProductsView;
 
