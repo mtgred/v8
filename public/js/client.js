@@ -1,5 +1,5 @@
 (function() {
-  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductsView, SalesApp, SettingsApp,
+  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductView, ProductsView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -50,7 +50,8 @@
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
-      return this.apps[app].navigate(page, args);
+      console.log(page, args, param);
+      return this.apps[app].navigate(page, args[0]);
     };
 
     return OpenERP;
@@ -258,6 +259,7 @@
   App = (function() {
 
     function App() {
+      this.navigate = __bind(this.navigate, this);
       var k, v, _ref;
       this.views = {};
       this.appMenu = new Backbone.Collection;
@@ -274,9 +276,9 @@
     }
 
     App.prototype.navigate = function() {
-      var arg, page,
+      var args, page,
         _this = this;
-      page = arguments[0], arg = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (page) this.activepage = page;
       this.appMenu.each(function(i) {
         return i.set('active', i.get('name') === _this.activepage);
@@ -363,9 +365,30 @@
     };
 
     function ECommerceApp() {
+      this.navigate = __bind(this.navigate, this);      this.collection = new Backbone.Collection;
+      this.collection.url = "/data/products";
+      this.collection.fetch();
       ECommerceApp.__super__.constructor.call(this);
-      this.views['Shop'] = (new ProductsView).render();
+      this.views['Shop'] = (new ProductsView({
+        collection: this.collection,
+        category: ""
+      })).render();
     }
+
+    ECommerceApp.prototype.navigate = function() {
+      var args, page, product;
+      page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      if (page === 'product' && args[0]) {
+        console.log(page, args[0]);
+        product = this.collection.find(function(p) {
+          return p.get('name') === args[0];
+        });
+        this.views[page] = (new ProductView({
+          model: product
+        })).render();
+      }
+      return ECommerceApp.__super__.navigate.call(this, page, args);
+    };
 
     return ECommerceApp;
 
@@ -384,15 +407,11 @@
 
     ProductsView.prototype.headerTemplate = _.template($('#page-header').html());
 
-    ProductsView.prototype.galleryTemplate = _.template($('#gallery-View').html());
+    ProductsView.prototype.galleryTemplate = _.template($('#gallery-view').html());
 
-    ProductsView.prototype.initialize = function(category) {
-      this.category = category;
+    ProductsView.prototype.initialize = function() {
       if (!this.category) this.category = "Shop";
-      this.collection = new Backbone.Collection;
-      this.collection.url = "/data/products";
-      this.collection.bind('reset', this.render);
-      return this.collection.fetch();
+      return this.collection.bind('reset', this.render);
     };
 
     ProductsView.prototype.events = {
@@ -409,12 +428,52 @@
 
     ProductsView.prototype.navigate = function(e) {
       e.preventDefault();
-      return openerp.navigate($(this.el).find('a').attr('href'), {
+      console.log(e);
+      console.log(e.srcElement.pathname);
+      return openerp.navigate(e.srcElement.pathname, {
         trigger: true
       });
     };
 
     return ProductsView;
+
+  })(Backbone.View);
+
+  ProductView = (function(_super) {
+
+    __extends(ProductView, _super);
+
+    function ProductView() {
+      this.render = __bind(this.render, this);
+      ProductView.__super__.constructor.apply(this, arguments);
+    }
+
+    ProductView.prototype.className = 'pageView';
+
+    ProductView.prototype.headerTemplate = _.template($('#page-header').html());
+
+    ProductView.prototype.pageTemplate = _.template($('#page-view').html());
+
+    ProductView.prototype.events = {
+      'click': 'navigate'
+    };
+
+    ProductView.prototype.render = function() {
+      return $(this.el).html(this.headerTemplate({
+        name: "Shop / " + (this.model.get('category')) + " / " + (this.model.get('name'))
+      })).append(this.pageTemplate({
+        product: this.model.toJSON()
+      }));
+    };
+
+    ProductView.prototype.navigate = function(e) {
+      e.preventDefault();
+      return openerp.navigate($(this.el).find('a').attr('href'), {
+        trigger: true
+      });
+    };
+
+    return ProductView;
 
   })(Backbone.View);
 

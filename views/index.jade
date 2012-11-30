@@ -60,7 +60,7 @@ block body
   script(type="text/template", id="Settings-Users")
     div Utilisateurs
 
-  script(type="text/template", id="gallery-View")
+  script(type="text/template", id="gallery-view")
     div.gallery
       <% _.each(products, function(p) { %>
       a.product(href!="/app/eCommerce/product/<%= p.name %>")
@@ -69,6 +69,15 @@ block body
         div.description <%= p.shortDescription %>
         div.price &euro; <%= p.price %>
       <% }); %>
+
+  script(type="text/template", id="page-view")
+    div.productpage
+      img(src!="/eCommerce/img/products/<%= product.name %>.jpg")
+      h2 <%= product.name %>
+      p <%= product.shortDescription %>
+      h3 <%= product.price %>
+      p <%= product.description %>
+      button Add to Cart
 
   script(type="text/template", id="eCommerce-Home")
     div.home
