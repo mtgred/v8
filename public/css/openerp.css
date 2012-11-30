@@ -402,3 +402,16 @@ textarea {
   display: inline-block;
   vertical-align: top;
 }
+.openerp .productpage > img {
+  display: inline-block;
+}
+.openerp .productpage .description {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 16px;
+}
+.openerp .productpage .description h1,
+.openerp .productpage .description h2,
+.openerp .productpage .description p {
+  margin: 8px 0;
+}

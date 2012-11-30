@@ -44,7 +44,8 @@ block body
     div Commandes
 
   script(type="text/template", id="eCommerce-ShoppingCart")
-    div Caddy
+    div.shoppingcart
+      
 
   script(type="text/template", id="eCommerce-Shop")
 
@@ -73,11 +74,12 @@ block body
   script(type="text/template", id="page-view")
     div.productpage
       img(src!="/eCommerce/img/products/<%= product.name %>.jpg")
-      h2 <%= product.name %>
-      p <%= product.shortDescription %>
-      h3 <%= product.price %>
-      p <%= product.description %>
-      button Add to Cart
+      div.description
+        h1 <%= product.name %>
+        p <%= product.shortDescription %>
+        h2 &euro; <%= product.price %>
+        p <%= product.description %>
+        button Add to Cart
 
   script(type="text/template", id="eCommerce-Home")
     div.home
