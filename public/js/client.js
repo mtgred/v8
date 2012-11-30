@@ -427,10 +427,10 @@
     };
 
     ProductsView.prototype.navigate = function(e) {
+      var t;
       e.preventDefault();
-      console.log(e);
-      console.log(e.srcElement.pathname);
-      return openerp.navigate(e.srcElement.pathname, {
+      t = e.srcElement.pathname ? e.srcElement.pathname : $(e.srcElement).parent().attr('href');
+      return openerp.navigate(t, {
         trigger: true
       });
     };

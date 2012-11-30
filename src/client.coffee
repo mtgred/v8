@@ -151,10 +151,8 @@ class ProductsView extends Backbone.View
     $(@el).html(@headerTemplate(name: @category)).append(@galleryTemplate {products: @collection.toJSON()})
   navigate: (e) ->
     e.preventDefault()
-    console.log e
-    console.log e.srcElement.pathname
-    #openerp.navigate($(@el).find('a').attr('href'), trigger: true)
-    openerp.navigate(e.srcElement.pathname, trigger: true)
+    t = if e.srcElement.pathname then e.srcElement.pathname else $(e.srcElement).parent().attr('href')
+    openerp.navigate(t, trigger: true)
 
 class ProductView extends Backbone.View
   className: 'pageView'
