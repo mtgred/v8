@@ -1,5 +1,5 @@
 (function() {
-  var App, AppMenuItemView, AppMenuView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductView, ProductsView, SalesApp, SettingsApp,
+  var App, AppMenuItemView, AppMenuView, CartView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductView, ProductsView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -50,7 +50,6 @@
       this.mainMenu.each(function(i) {
         return i.set('active', i.get('name') === app);
       });
-      console.log(page, args, param);
       return this.apps[app].navigate(page, args[0]);
     };
 
@@ -267,9 +266,10 @@
       for (k in _ref) {
         v = _ref[k];
         v.active = false;
+        v.counter = 0;
         v.app = this.name;
         this.appMenu.add(v);
-        this.views[k] = (new PageView(v)).render();
+        if (!this.views[k]) this.views[k] = (new PageView(v)).render();
       }
       this.menu = (new AppMenuView(this)).render();
       this.navigate(this.defaultpage);
@@ -365,13 +365,17 @@
     };
 
     function ECommerceApp() {
-      this.navigate = __bind(this.navigate, this);      this.collection = new Backbone.Collection;
-      this.collection.url = "/data/products";
-      this.collection.fetch();
+      this.navigate = __bind(this.navigate, this);      this.products = new Backbone.Collection;
+      this.products.url = "/data/products";
+      this.products.fetch();
+      this.cart = new Backbone.Collection;
       ECommerceApp.__super__.constructor.call(this);
       this.views['Shop'] = (new ProductsView({
-        collection: this.collection,
+        collection: this.products,
         category: ""
+      })).render();
+      this.views['Shopping Cart'] = (new CartView({
+        collection: this.cart
       })).render();
     }
 
@@ -379,8 +383,7 @@
       var args, page, product;
       page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (page === 'product' && args[0]) {
-        console.log(page, args[0]);
-        product = this.collection.find(function(p) {
+        product = this.products.find(function(p) {
           return p.get('name') === args[0];
         });
         this.views[page] = (new ProductView({
@@ -388,6 +391,20 @@
         })).render();
       }
       return ECommerceApp.__super__.navigate.call(this, page, args);
+    };
+
+    ECommerceApp.prototype.addToCart = function(product, quantity) {
+      var counter;
+      this.cart.add({
+        qty: quantity,
+        product: product
+      });
+      counter = this.cart.reduce((function(sum, l) {
+        return parseInt(l.get('qty')) + sum;
+      }), 0);
+      return this.appMenu.each(function(i) {
+        if (i.get('name') === "Shopping Cart") return i.set('counter', counter);
+      });
     };
 
     return ECommerceApp;
@@ -444,6 +461,7 @@
     __extends(ProductView, _super);
 
     function ProductView() {
+      this.addToCart = __bind(this.addToCart, this);
       this.render = __bind(this.render, this);
       ProductView.__super__.constructor.apply(this, arguments);
     }
@@ -455,7 +473,7 @@
     ProductView.prototype.pageTemplate = _.template($('#page-view').html());
 
     ProductView.prototype.events = {
-      'click': 'navigate'
+      'click .addtocart': 'addToCart'
     };
 
     ProductView.prototype.render = function() {
@@ -466,14 +484,56 @@
       }));
     };
 
-    ProductView.prototype.navigate = function(e) {
+    ProductView.prototype.addToCart = function() {
+      return openerp.apps['eCommerce'].addToCart(this.model, $('.quantity').val());
+    };
+
+    return ProductView;
+
+  })(Backbone.View);
+
+  CartView = (function(_super) {
+
+    __extends(CartView, _super);
+
+    function CartView() {
+      this.render = __bind(this.render, this);
+      CartView.__super__.constructor.apply(this, arguments);
+    }
+
+    CartView.prototype.className = 'cart';
+
+    CartView.prototype.headerTemplate = _.template($('#page-header').html());
+
+    CartView.prototype.cartTemplate = _.template($('#ShoppingCart').html());
+
+    CartView.prototype.initialize = function() {
+      this.collection.bind('reset', this.render);
+      return this.collection.bind('add', this.render);
+    };
+
+    CartView.prototype.events = {
+      'click': 'navigate'
+    };
+
+    CartView.prototype.render = function() {
+      return $(this.el).html(this.headerTemplate({
+        name: "Shopping Cart"
+      })).append(this.cartTemplate({
+        cart: this.collection.toJSON()
+      }));
+    };
+
+    CartView.prototype.navigate = function(e) {
+      var t;
       e.preventDefault();
-      return openerp.navigate($(this.el).find('a').attr('href'), {
+      t = e.srcElement.pathname ? e.srcElement.pathname : $(e.srcElement).parent().attr('href');
+      return openerp.navigate(t, {
         trigger: true
       });
     };
 
-    return ProductView;
+    return CartView;
 
   })(Backbone.View);
 

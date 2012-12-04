@@ -23,6 +23,9 @@ block body
 
   script(type="text/template", id="appmenu-item")
     a(href!="/app/<%= app %>/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
+    <% if(counter > 0) { %>
+    span.counter <%= counter %>
+    <% } %>
 
   script(type="text/template", id="appmenu-section")
     div.section
@@ -44,8 +47,39 @@ block body
     div Commandes
 
   script(type="text/template", id="eCommerce-ShoppingCart")
-    div.shoppingcart
-      
+
+  script(type="text/template", id="ShoppingCart")
+    table.shoppingcart
+      tr
+        th
+        th Quantity
+        th Price
+        th
+
+      <% if(cart.length == 0) { %>
+      tr
+        td(span="4") Your shopping car is empty
+      <% } else { %>
+      <% cart.forEach(function(p) { %>
+      tr
+        td
+          a.product(href!="/app/eCommerce/product/<%= p.name %>")
+            img(src!="/eCommerce/img/products/<%= p.name %>.jpg")
+            h4 <%= p.name %>
+            <%= p.shortDescription %>
+        td
+          input(value!="<%= p.qty %>")
+        td
+          div.price &euro; <%= p.price %>
+        td
+          a(href="") Remove
+      <% }); %>
+      tr
+        td
+        td
+        td <%= cart.reduce(function(sum, l) { return sum + l.qty; }, 0) %>
+        td
+      <% } %>
 
   script(type="text/template", id="eCommerce-Shop")
 
@@ -63,7 +97,7 @@ block body
 
   script(type="text/template", id="gallery-view")
     div.gallery
-      <% _.each(products, function(p) { %>
+      <% products.forEach(function(p) { %>
       a.product(href!="/app/eCommerce/product/<%= p.name %>")
         img(src!="/eCommerce/img/products/<%= p.name %>.jpg")
         div.name <%= p.name %>
@@ -79,7 +113,11 @@ block body
         p <%= product.shortDescription %>
         h2 &euro; <%= product.price %>
         p <%= product.description %>
-        button Add to Cart
+        p
+          label(for="quantity") Quantity
+        p
+          input.quantity(type="text", name="quantity", value="1")
+        button.addtocart Add to Cart
 
   script(type="text/template", id="eCommerce-Home")
     div.home

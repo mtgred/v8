@@ -17,7 +17,6 @@ class OpenERP extends Backbone.Router
     [app, page, args...] = param.split("/")
     @navigate("/app/#{app}/#{@apps[app].activepage}", trigger: false, replace: true) unless page
     @mainMenu.each (i) -> i.set('active', i.get('name') is app)
-    console.log page, args, param
     @apps[app].navigate(page, args[0])
 
 # Main menu
@@ -93,9 +92,10 @@ class App
     @appMenu = new Backbone.Collection
     for k, v of @pages
       v.active = false
+      v.counter = 0
       v.app = @name
       @appMenu.add(v)
-      @views[k] = (new PageView(v)).render()
+      @views[k] = (new PageView(v)).render() unless @views[k]
     @menu = (new AppMenuView(@)).render()
     @navigate(@defaultpage)
   navigate: (page, args...) =>
@@ -127,17 +127,22 @@ class ECommerceApp extends App
     'Products': {section: 'Configuration', name: 'Products'}
     'Product Categories': {section: 'Configuration', name: 'Product Categories'}
   constructor: ->
-    @collection = new Backbone.Collection
-    @collection.url = "/data/products"
-    @collection.fetch()
+    @products = new Backbone.Collection
+    @products.url = "/data/products"
+    @products.fetch()
+    @cart = new Backbone.Collection
     super()
-    @views['Shop'] = (new ProductsView({collection: @collection, category: ""})).render()
+    @views['Shop'] = (new ProductsView({collection: @products, category: ""})).render()
+    @views['Shopping Cart'] = (new CartView(collection: @cart)).render()
   navigate: (page, args...) =>
     if page is 'product' and args[0]
-      console.log page, args[0]
-      product = @collection.find (p) -> p.get('name') is args[0]
+      product = @products.find (p) -> p.get('name') is args[0]
       @views[page] = (new ProductView(model: product)).render()
     super(page, args)
+  addToCart: (product, quantity)->
+    @cart.add({qty: quantity, product: product})
+    counter = @cart.reduce(((sum, l) -> return parseInt(l.get('qty')) + sum), 0)
+    @appMenu.each (i) -> i.set('counter', counter) if i.get('name') is "Shopping Cart"
 
 class ProductsView extends Backbone.View
   className: 'galleryView'
@@ -158,13 +163,28 @@ class ProductView extends Backbone.View
   className: 'pageView'
   headerTemplate: _.template $('#page-header').html()
   pageTemplate: _.template $('#page-view').html()
-  events: 'click': 'navigate'
+  events: 'click .addtocart': 'addToCart'
   render: =>
     $(@el).html(@headerTemplate(name: "Shop / #{@model.get('category')} / #{@model.get('name')}"))
       .append(@pageTemplate {product: @model.toJSON()})
+  addToCart: => openerp.apps['eCommerce'].addToCart(@model, $('.quantity').val())
+
+class CartView extends Backbone.View
+  className: 'cart'
+  headerTemplate: _.template $('#page-header').html()
+  cartTemplate: _.template $('#ShoppingCart').html()
+  initialize: ->
+    @collection.bind('reset', @render)
+    @collection.bind('add', @render)
+  events: 'click': 'navigate'
+  render: =>
+    $(@el).html(@headerTemplate(name: "Shopping Cart")).append(@cartTemplate {cart: @collection.toJSON()})
+    #if @collection.length > 0
+      #$(".appMenuItem:contains('Shopping Cart')").append('foo')
   navigate: (e) ->
     e.preventDefault()
-    openerp.navigate($(@el).find('a').attr('href'), trigger: true)
+    t = if e.srcElement.pathname then e.srcElement.pathname else $(e.srcElement).parent().attr('href')
+    openerp.navigate(t, trigger: true)
 
 # Settings
 class SettingsApp extends App
