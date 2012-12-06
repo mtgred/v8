@@ -135,9 +135,7 @@ class ECommerceApp extends App
     @views['Shop'] = (new ProductsView({collection: @products, category: ""})).render()
     @views['Shopping Cart'] = (new CartView(collection: @cart)).render()
   navigate: (page, args...) =>
-    if page is 'product' and args[0]
-      product = @products.find (p) -> p.get('name') is args[0]
-      @views[page] = (new ProductView(model: product)).render()
+    @views[page] = (new ProductView(args[0])).render() if page is 'product' and args[0]
     super(page, args)
   addToCart: (product, quantity)->
     @cart.add({qty: quantity, product: product})
@@ -159,14 +157,20 @@ class ProductsView extends Backbone.View
     t = if e.srcElement.pathname then e.srcElement.pathname else $(e.srcElement).parent().attr('href')
     openerp.navigate(t, trigger: true)
 
+class Product extends Backbone.Model
+  urlRoot: '/data/products'
+
 class ProductView extends Backbone.View
   className: 'pageView'
   headerTemplate: _.template $('#page-header').html()
   pageTemplate: _.template $('#page-view').html()
+  initialize: (name) ->
+    @model = new Product(id: name)
+    @model.bind('change', @render)
+    @model.fetch()
   events: 'click .addtocart': 'addToCart'
   render: =>
-    $(@el).html(@headerTemplate(name: "Shop / #{@model.get('category')} / #{@model.get('name')}"))
-      .append(@pageTemplate {product: @model.toJSON()})
+    $(@el).html(@headerTemplate(name: "Shop / #{@model.get('category')} / #{@model.get('name')}")).append(@pageTemplate {product: @model.toJSON()})
   addToCart: => openerp.apps['eCommerce'].addToCart(@model, $('.quantity').val())
 
 class CartView extends Backbone.View
@@ -179,8 +183,6 @@ class CartView extends Backbone.View
   events: 'click': 'navigate'
   render: =>
     $(@el).html(@headerTemplate(name: "Shopping Cart")).append(@cartTemplate {cart: @collection.toJSON()})
-    #if @collection.length > 0
-      #$(".appMenuItem:contains('Shopping Cart')").append('foo')
   navigate: (e) ->
     e.preventDefault()
     t = if e.srcElement.pathname then e.srcElement.pathname else $(e.srcElement).parent().attr('href')

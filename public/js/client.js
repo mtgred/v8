@@ -1,5 +1,5 @@
 (function() {
-  var App, AppMenuItemView, AppMenuView, CartView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, ProductView, ProductsView, SalesApp, SettingsApp,
+  var App, AppMenuItemView, AppMenuView, CartView, ECommerceApp, MainMenuItemView, MainMenuView, OpenERP, PageView, Product, ProductView, ProductsView, SalesApp, SettingsApp,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; },
@@ -380,15 +380,10 @@
     }
 
     ECommerceApp.prototype.navigate = function() {
-      var args, page, product;
+      var args, page;
       page = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
       if (page === 'product' && args[0]) {
-        product = this.products.find(function(p) {
-          return p.get('name') === args[0];
-        });
-        this.views[page] = (new ProductView({
-          model: product
-        })).render();
+        this.views[page] = (new ProductView(args[0])).render();
       }
       return ECommerceApp.__super__.navigate.call(this, page, args);
     };
@@ -456,6 +451,20 @@
 
   })(Backbone.View);
 
+  Product = (function(_super) {
+
+    __extends(Product, _super);
+
+    function Product() {
+      Product.__super__.constructor.apply(this, arguments);
+    }
+
+    Product.prototype.urlRoot = '/data/products';
+
+    return Product;
+
+  })(Backbone.Model);
+
   ProductView = (function(_super) {
 
     __extends(ProductView, _super);
@@ -471,6 +480,14 @@
     ProductView.prototype.headerTemplate = _.template($('#page-header').html());
 
     ProductView.prototype.pageTemplate = _.template($('#page-view').html());
+
+    ProductView.prototype.initialize = function(name) {
+      this.model = new Product({
+        id: name
+      });
+      this.model.bind('change', this.render);
+      return this.model.fetch();
+    };
 
     ProductView.prototype.events = {
       'click .addtocart': 'addToCart'

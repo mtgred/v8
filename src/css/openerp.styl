@@ -300,20 +300,20 @@ input, textarea
             background: #eee
             color: purple
             box-shadow(inset 0 1px 2px rgba(0, 0, 0, 0.2))
+          .counter
+            background: #eee
+            color: purple
         .counter
           background: purple
           color: #eee
           float: right
           text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2)
-          margin: 1px
+          margin: 1px 4px
           padding: 1px 4px
           border: none
           radius(3px)
           font-size: 11px
           cursor: pointer
-        .active + .counter
-          background: #eee
-          color: purple
 
   .content
     position: absolute
@@ -388,6 +388,8 @@ input, textarea
   .productpage
     > img
       display: inline-block
+      width: 360px
+      height: 360px
     .description
       display: inline-block
       vertical-align: top
@@ -395,3 +397,14 @@ input, textarea
       h1, h2, p
         margin: 8px 0
 
+  .shoppingcart
+    .product
+      img
+        width: 80px
+        height: 80px
+    tr
+      td
+        border-bottom: 1px solid border-color
+
+  input.quantity
+    width: 38px

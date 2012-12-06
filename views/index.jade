@@ -22,10 +22,11 @@ block body
     a(href!="/app/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
 
   script(type="text/template", id="appmenu-item")
-    a(href!="/app/<%= app %>/<%= name %>", class!="<% if(active) print('active') %>") <%= name %>
-    <% if(counter > 0) { %>
-    span.counter <%= counter %>
-    <% } %>
+    a(href!="/app/<%= app %>/<%= name %>", class!="<% if(active) print('active') %>")
+      | <%= name %>
+      <% if(counter > 0) { %>
+      span.counter <%= counter %>
+      <% } %>
 
   script(type="text/template", id="appmenu-section")
     div.section
@@ -52,6 +53,7 @@ block body
     table.shoppingcart
       tr
         th
+        th
         th Quantity
         th Price
         th
@@ -63,21 +65,24 @@ block body
       <% cart.forEach(function(p) { %>
       tr
         td
-          a.product(href!="/app/eCommerce/product/<%= p.name %>")
-            img(src!="/eCommerce/img/products/<%= p.name %>.jpg")
-            h4 <%= p.name %>
-            <%= p.shortDescription %>
+          a.product(href!="/app/eCommerce/product/<%= p.product.get('name') %>")
+            img(src!="/eCommerce/img/products/<%= p.product.get('name') %>.jpg")
         td
-          input(value!="<%= p.qty %>")
+          a.product(href!="/app/eCommerce/product/<%= p.product.get('name') %>")
+            h4 <%= p.product.get('name') %>
+            <%= p.product.get('shortDescription') %>
         td
-          div.price &euro; <%= p.price %>
+          input.quantity(value!="<%= p.qty %>")
+        td
+          div.price &euro; <%= p.product.get('price') %>
         td
           a(href="") Remove
       <% }); %>
       tr
         td
         td
-        td <%= cart.reduce(function(sum, l) { return sum + l.qty; }, 0) %>
+        td
+        td &euro; <%= cart.reduce(function(sum, l) { return sum + l.product.get('price'); }, 0) %>
         td
       <% } %>
 
@@ -114,10 +119,8 @@ block body
         h2 &euro; <%= product.price %>
         p <%= product.description %>
         p
-          label(for="quantity") Quantity
-        p
           input.quantity(type="text", name="quantity", value="1")
-        button.addtocart Add to Cart
+          button.addtocart Add to Cart
 
   script(type="text/template", id="eCommerce-Home")
     div.home

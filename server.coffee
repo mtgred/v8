@@ -43,8 +43,10 @@ app.configure 'production', -> app.use express.errorHandler()
 
 app.get '/data/:collection', (req, res) ->
   db[req.params.collection].find().exec (err, coll) ->
-    console.error(err) if err
-    res.json(200, coll)
+    console.error(err) if err; res.json(200, coll)
+app.get '/data/:collection/:id', (req, res) ->
+  db[req.params.collection].findOne(name: req.params.id).exec (err, coll) ->
+    console.error(err) if err; res.json(200, coll)
 app.get '/*', (req, res) -> res.render('index.jade', title: 'OpenERP')
 
 #io.sockets.on 'connection', (socket) ->
